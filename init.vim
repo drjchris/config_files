@@ -1,7 +1,4 @@
-" Plugin manager for not so minimalist.rc"
-
-" Dont forget to install the plugin manager first
-" https://github.com/junegunn/vim-plug
+" lugin manager for not so minimalist.rc"
 
 call plug#begin()
 
@@ -11,12 +8,19 @@ call plug#begin()
     Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'  }
     Plug 'vim-pandoc/vim-pandoc-syntax'
     Plug 'quarto-dev/quarto-vim'
+    Plug 'vimwiki/vimwiki'
+
+    " code completion
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
 
 call plug#end()
 
 " Set color theme
 colorscheme kanagawa-wave
 
+" set space as the leader key
+let mapleader=" "
 
 " Minimalist .vimrc
 
@@ -70,6 +74,16 @@ syntax on
 " Recognise Markdown files for filetype-specific settings
 filetype plugin on
 
+
+" ===== COC CODE COMPLETION
+
+" Map <Right> to confirm a selection in CoC's completion menu if it is visible
+inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
+" Use <Tab> and <Shift-Tab> for navigation
+inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+set signcolumn=yes:1
+
 "==== NEOVIDE =====
 
 if exists("g:neovide")
@@ -82,20 +96,29 @@ endif
 "========= FILE TYPE SPECIFIC
 
 " MARKDOWN
+autocmd BufNewFile,BufRead *.md set filetype=markdown " syntax hilight
 autocmd FileType markdown setlocal spell
 autocmd FileType markdown setlocal colorcolumn=80
-autocmd BufNewFile,BufRead *.md set filetype=markdown " syntax hilight
 autocmd FileType markdown inoremap ` ``<Esc>i
 
 augroup markdown_wrap
     autocmd!
-    autocmd FileType markdown nnoremap <buffer> <space>ww :call HardWrapText()<CR>
-    autocmd FileType markdown nnoremap <buffer> <space>wu :call UnwrapText()<CR>
+    autocmd FileType markdown nnoremap <buffer> <space>tw :call HardWrapText()<CR>
+    autocmd FileType markdown nnoremap <buffer> <space>tu :call UnwrapText()<CR>
     autocmd FileType markdown setlocal tabstop=2 shiftwidth=2 expandtab
 augroup END
 
 
 
+
+" PYTHON
+autocmd BufNewFile,BufRead *.py set filetype=python
+autocmd FileType python nnoremap <buffer> <leader>/ :call ToggleComment()<CR>
+autocmd FileType python vnoremap <buffer> <leader>/ :call ToggleComment()<CR>
+
+
+
+" QUARTO
 autocmd FileType quarto setlocal spell
 autocmd FileType quarto setlocal colorcolumn=80
 autocmd BufNewFile,BufRead *.qmd set filetype=quarto
@@ -104,6 +127,10 @@ autocmd FileType quarto nnoremap <buffer> <space>wu :call UnwrapText()<CR>
 autocmd FileType quarto setlocal tabstop=2 shiftwidth=2 expandtab
 
 
+" ===== VIM WIKI ====="
+set nocompatible
+let g:vimwiki_list = [{'path': '~/Library/CloudStorage/OneDrive-UniversityofBrighton/Documents/vimwiki',
+                      \ 'syntax': 'markdown', 'ext': 'md'}]
 
 
 " PYTHON
@@ -141,4 +168,28 @@ function! UnwrapText()
 
     " Restore the original 'textwidth'
     let &textwidth = l:original_tw
+endfunction
+
+
+function! ToggleComment()
+    " Get the mode to determine whether to operate on a single line or a visual selection
+    if mode() == 'v' || mode() == 'V'
+        " In visual mode, operate on the selected lines
+        '<,'>s/^\s*# \?/&/
+        '<,'>s/^\(\s*\)# /\1/
+        normal gv
+    else
+        " Save the current cursor position for normal mode
+        let currentPos = getpos('.')
+        
+        " Check if the current line starts with '# ' and toggle it
+        if getline('.') =~ '^\s*# '
+            execute 'silent! s/^\s*# //'
+        else
+            execute 'silent! s/^\s*/&# /'
+        endif
+
+        " Restore the cursor position
+        call setpos('.', currentPos)
+    endif
 endfunction
