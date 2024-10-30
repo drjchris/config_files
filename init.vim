@@ -13,7 +13,6 @@ call plug#begin()
     " code completion
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-
 call plug#end()
 
 " Set color theme
@@ -52,6 +51,9 @@ inoremap ' ''<Esc>i
 " Do not highlight search results after a search
 set nohlsearch
 
+" File explorer remap
+nnoremap <space>fe :Ex <cr>
+
 " telescope remaps
 nnoremap <space>ff <cmd>Telescope find_files<cr>
 nnoremap <space>fg <cmd>Telescope live_grep<cr>
@@ -67,6 +69,8 @@ set clipboard=unnamedplus
 
 " Enable file type detection
 filetype on
+
+
 
 " Enable syntax highlighting
 syntax on
@@ -110,12 +114,10 @@ augroup END
 
 
 
-
 " PYTHON
 autocmd BufNewFile,BufRead *.py set filetype=python
 autocmd FileType python nnoremap <buffer> <leader>/ :call ToggleComment()<CR>
 autocmd FileType python vnoremap <buffer> <leader>/ :call ToggleComment()<CR>
-
 
 
 " QUARTO
@@ -129,7 +131,7 @@ autocmd FileType quarto setlocal tabstop=2 shiftwidth=2 expandtab
 
 " ===== VIM WIKI ====="
 set nocompatible
-let g:vimwiki_list = [{'path': '~/Library/CloudStorage/OneDrive-UniversityofBrighton/Documents/vimwiki',
+let g:vimwiki_list = [{'path': '~/Documents/vimwiki',
                       \ 'syntax': 'markdown', 'ext': 'md'}]
 
 
@@ -193,3 +195,4 @@ function! ToggleComment()
         call setpos('.', currentPos)
     endif
 endfunction
+
