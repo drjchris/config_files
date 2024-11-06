@@ -3,6 +3,8 @@
 alias ls="eza --group-directories-first --icons=always -l"
 alias tree="eza --group-directories-first --tree --level=2"
 alias checkoutpy="pip freeze > requirements.txt"
+alias lsbin="ls ~/loc_bin"
+
 
 # directory shortcuts
 alias nvimconf="nvim ~/.config/nvim/init.vim"
